@@ -9,6 +9,8 @@
 #import "KBAppDelegate.h"
 
 #import "KBViewController.h"
+#import  <PebbleKit/PebbleKit.h>
+#import "KBPebbleThing.h"
 
 @implementation KBAppDelegate
 
@@ -19,6 +21,10 @@
     self.viewController = [[KBViewController alloc] initWithNibName:@"KBViewController" bundle:nil];
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
+    
+    self.pebbleThing = [[KBPebbleThing alloc] init];
+
+    
     return YES;
 }
 

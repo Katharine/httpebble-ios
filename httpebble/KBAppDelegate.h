@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+@class KBPebbleThing;
 @class KBViewController;
 
 @interface KBAppDelegate : UIResponder <UIApplicationDelegate>
@@ -15,5 +16,7 @@
 @property (strong, nonatomic) UIWindow *window;
 
 @property (strong, nonatomic) KBViewController *viewController;
+
+@property (strong, nonatomic) KBPebbleThing *pebbleThing;
 
 @end
