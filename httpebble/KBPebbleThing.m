@@ -9,7 +9,8 @@
 #import "KBPebbleThing.h"
 #import <PebbleKit/PebbleKit.h>
 #define HTTP_UUID { 0x91, 0x41, 0xB6, 0x28, 0xBC, 0x89, 0x49, 0x8E, 0xB1, 0x47, 0x04, 0x9F, 0x49, 0xC0, 0x99, 0xAD }
-#define URL_KEY @(0xFFFF)
+
+#define HTTP_URL_KEY @(0xFFFF)
 #define HTTP_STATUS_KEY @(0xFFFE)
 #define HTTP_SUCCESS_KEY @(0xFFFD)
 #define HTTP_COOKIE_KEY @(0xFFFC)
@@ -93,7 +94,7 @@ void errorResponse(PBWatch* watch, NSInteger status) {
 
 - (BOOL)handleWatch:(PBWatch *)watch message:(NSDictionary *)message {
     NSLog(@"Message received.");
-    if(![message objectForKey:URL_KEY]) {
+    if(![message objectForKey:HTTP_URL_KEY]) {
         return NO;
     }
     NSURL* url = [NSURL URLWithString:[message objectForKey:URL_KEY]];
@@ -101,12 +102,12 @@ void errorResponse(PBWatch* watch, NSInteger status) {
     NSLog(@"Asked to request the contents of %@", url);
     NSMutableDictionary *request_dict = [[NSMutableDictionary alloc] initWithCapacity:[message count]];
     for (NSNumber* key in message) {
-        if([key isEqualToNumber:URL_KEY] || [key isEqualToNumber:HTTP_COOKIE_KEY]) {
+        if([key isEqualToNumber:HTTP_URL_KEY] || [key isEqualToNumber:HTTP_COOKIE_KEY]) {
             continue;
         }
         [request_dict setValue:[message objectForKey:key] forKey:[key stringValue]];
     }
-    [request_dict removeObjectsForKeys:@[URL_KEY, HTTP_COOKIE_KEY]];
+    [request_dict removeObjectsForKeys:@[HTTP_URL_KEY, HTTP_COOKIE_KEY]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:request_dict options:0 error:nil]];
