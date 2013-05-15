@@ -97,7 +97,7 @@ void errorResponse(PBWatch* watch, NSInteger status) {
     if(![message objectForKey:HTTP_URL_KEY]) {
         return NO;
     }
-    NSURL* url = [NSURL URLWithString:[message objectForKey:URL_KEY]];
+    NSURL* url = [NSURL URLWithString:[message objectForKey:HTTP_URL_KEY]];
     NSNumber* cookie = [message objectForKey:HTTP_COOKIE_KEY];
     NSLog(@"Asked to request the contents of %@", url);
     NSMutableDictionary *request_dict = [[NSMutableDictionary alloc] initWithCapacity:[message count]];
