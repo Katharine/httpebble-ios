@@ -13,6 +13,7 @@
 #define HTTP_STATUS_KEY @(0xFFFE)
 #define HTTP_SUCCESS_KEY @(0xFFFD)
 #define HTTP_COOKIE_KEY @(0xFFFC)
+#define HTTP_CONNECT_KEY @(0xFFFB)
 
 @interface KBPebbleThing () <PBPebbleCentralDelegate> {
     PBWatch *ourWatch; // We actually never really use this.
@@ -36,28 +37,47 @@
 }
 
 - (void)setOurWatch:(PBWatch*)watch {
+    if(watch == nil) return;
     [watch appMessagesGetIsSupported:^(PBWatch *watch, BOOL isAppMessagesSupported) {
         if(!isAppMessagesSupported) return;
         uint8_t uuid[] = HTTP_UUID;
         [watch appMessagesSetUUID:[NSData dataWithBytes:uuid length:sizeof(uuid)]];
+        if(ourWatch && updateHandler)
+            [ourWatch appMessagesRemoveUpdateHandler:updateHandler];
+        
         updateHandler = [watch appMessagesAddReceiveUpdateHandler:^BOOL(PBWatch *watch, NSDictionary *update) {
             return [self handleWatch:watch message:update];
         }];
-        NSLog(@"Update handler: %@", updateHandler);
         ourWatch = watch;
         NSLog(@"Connected to watch %@", [watch name]);
+        [watch appMessagesPushUpdate:@{HTTP_CONNECT_KEY: [NSNumber numberWithUint8:YES]} onSent:^(PBWatch *watch, NSDictionary *update, NSError *error) {
+            if(!error) {
+                NSLog(@"Pushed post-reconnect update.");
+            } else {
+                NSLog(@"Error pushing post-reconnect update: %@", error);
+            }
+        }];
     }];
 }
 
 #pragma mark PBPebbleCentral delegate
 
 - (void)pebbleCentral:(PBPebbleCentral *)central watchDidConnect:(PBWatch *)watch isNew:(BOOL)isNew {
-    NSLog(@"A watch connected: %@", [watch friendlyDescription]);
+    NSLog(@"A watch connected: %@", [watch name]);
     [self setOurWatch:watch];
 }
 
 - (void)pebbleCentral:(PBPebbleCentral *)central watchDidDisconnect:(PBWatch *)watch {
     NSLog(@"A watch disconnected.");
+    if(watch == ourWatch) {
+        NSLog(@"It was ours!");
+        [watch closeSession:nil];
+        if(updateHandler) {
+            [watch appMessagesRemoveUpdateHandler:updateHandler];
+            updateHandler = nil;
+        }
+        [self setOurWatch:nil];
+    }
 }
 
 #pragma mark Other stuff
