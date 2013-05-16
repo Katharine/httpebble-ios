@@ -110,6 +110,8 @@ void errorResponse(PBWatch* watch, NSInteger status) {
     [request_dict removeObjectsForKeys:@[HTTP_URL_KEY, HTTP_COOKIE_KEY]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
+    [request setValue:[watch serialNumber] forHTTPHeaderField:@"X-Pebble-ID"];
+    NSLog(@"X-Pebble-ID: %@", [request valueForHTTPHeaderField:@"X-Pebble-ID"]);
     [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:request_dict options:0 error:nil]];
     NSLog(@"Made request with data: %@", request_dict);
     [NSURLConnection sendAsynchronousRequest:request
