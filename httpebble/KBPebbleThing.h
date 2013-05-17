@@ -10,4 +10,6 @@
 
 @interface KBPebbleThing : NSObject
 
+- (void)saveKeyValueData;
+
 @end
