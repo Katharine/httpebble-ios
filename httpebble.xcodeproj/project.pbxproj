@@ -10,6 +10,7 @@
 		89AC134117458F0F006847A7 /* PebbleModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 89AC133F17458F0F006847A7 /* PebbleModel.xcdatamodeld */; };
 		89AC134717459B20006847A7 /* KBPebbleValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 89AC134617459B20006847A7 /* KBPebbleValue.m */; };
 		89AC13831745B12D006847A7 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89AC13821745B12D006847A7 /* CoreData.framework */; };
+		89AC1385174632E4006847A7 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89AC1384174632E4006847A7 /* CoreLocation.framework */; };
 		89E96D2A173DA96B00E2DE9D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89E96D29173DA96B00E2DE9D /* UIKit.framework */; };
 		89E96D2C173DA96B00E2DE9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89E96D2B173DA96B00E2DE9D /* Foundation.framework */; };
 		89E96D2E173DA96B00E2DE9D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89E96D2D173DA96B00E2DE9D /* CoreGraphics.framework */; };
@@ -36,6 +37,7 @@
 		89AC134517459B20006847A7 /* KBPebbleValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KBPebbleValue.h; path = httpebble/KBPebbleValue.h; sourceTree = "<group>"; };
 		89AC134617459B20006847A7 /* KBPebbleValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KBPebbleValue.m; path = httpebble/KBPebbleValue.m; sourceTree = "<group>"; };
 		89AC13821745B12D006847A7 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		89AC1384174632E4006847A7 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		89E96D26173DA96B00E2DE9D /* httpebble.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = httpebble.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		89E96D29173DA96B00E2DE9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		89E96D2B173DA96B00E2DE9D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -68,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				89AC1385174632E4006847A7 /* CoreLocation.framework in Frameworks */,
 				89AC13831745B12D006847A7 /* CoreData.framework in Frameworks */,
 				89E96D5C173DB49500E2DE9D /* MessageUI.framework in Frameworks */,
 				89E96D5A173DB47D00E2DE9D /* CoreMotion.framework in Frameworks */,
@@ -88,6 +91,7 @@
 		89E96D1D173DA96B00E2DE9D = {
 			isa = PBXGroup;
 			children = (
+				89AC1384174632E4006847A7 /* CoreLocation.framework */,
 				89AC13821745B12D006847A7 /* CoreData.framework */,
 				89AC133F17458F0F006847A7 /* PebbleModel.xcdatamodeld */,
 				89AC134517459B20006847A7 /* KBPebbleValue.h */,

@@ -10,6 +10,7 @@
 #import "KBPebbleValue.h"
 #import <PebbleKit/PebbleKit.h>
 #import <CoreData/CoreData.h>
+#import <CoreLocation/CoreLocation.h>
 #define HTTP_UUID { 0x91, 0x41, 0xB6, 0x28, 0xBC, 0x89, 0x49, 0x8E, 0xB1, 0x47, 0x04, 0x9F, 0x49, 0xC0, 0x99, 0xAD }
 
 #define HTTP_URL_KEY @(0xFFFF)
@@ -29,12 +30,20 @@
 #define HTTP_IS_DST_KEY @(0xFFF7)
 #define HTTP_TZ_NAME_KEY @(0xFFF8)
 
-@interface KBPebbleThing () <PBPebbleCentralDelegate> {
+#define HTTP_LOCATION_KEY @(0xFFE0)
+#define HTTP_LATITUDE_KEY @(0xFFE1)
+#define HTTP_LONGITUDE_KEY @(0xFFE2)
+#define HTTP_ALTITUDE_KEY @(0xFFE3)
+
+@interface KBPebbleThing () <PBPebbleCentralDelegate, CLLocationManagerDelegate> {
     PBWatch *ourWatch; // We actually never really use this.
     id updateHandler;
+    
+    // Assorted managers
     NSManagedObjectContext *managedObjectContext; // Because Core Data.
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;
+    CLLocationManager *locationManager;
 }
 
 - (BOOL)handleWatch:(PBWatch*)watch message:(NSDictionary*)message;
@@ -44,6 +53,7 @@
 - (BOOL)handleWatch:(PBWatch*)watch saveFromMessage:(NSDictionary*)message;
 - (BOOL)handleWatch:(PBWatch *)watch deleteFromMessage:(NSDictionary *)message;
 - (BOOL)handleWatch:(PBWatch *)watch timeFromMessage:(NSDictionary *)message;
+- (BOOL)handleWatch:(PBWatch *)watch locationFromMessage:(NSDictionary *)message;
 - (KBPebbleValue*)getStoredValueForApp:(NSNumber*)appID withKey:(NSNumber*)key;
 - (void)storeId:(id)value InPebbleValue:(KBPebbleValue*)pv;
 - (id)getIdFromPebbleValue:(KBPebbleValue*)pv;
@@ -58,6 +68,12 @@
     if (self) {
         [[PBPebbleCentral defaultCentral] setDelegate:self];
         [self setOurWatch:[[PBPebbleCentral defaultCentral] lastConnectedWatch]];
+        
+        // Set up location management.
+        locationManager = [[CLLocationManager alloc] init];
+        locationManager.delegate = self;
+        locationManager.distanceFilter = kCLDistanceFilterNone;
+        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
         
         // Set up the object model.
         NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"PebbleModel" withExtension:@"momd"];
@@ -114,6 +130,28 @@
     }];
 }
 
+#pragma mark CLLocationManager delegate
+
+NSNumber* floatAsPBNumber(float value) {
+    return [NSNumber numberWithUint32:(*(uint32_t*)&value)];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    CLLocation *location = [locations lastObject];
+    if(abs([location.timestamp timeIntervalSinceNow]) < 60) {
+        [locationManager stopUpdatingLocation];
+        
+        // Send a message back.
+        NSDictionary *response = @{HTTP_LOCATION_KEY: floatAsPBNumber(location.horizontalAccuracy),
+                                   HTTP_LATITUDE_KEY: floatAsPBNumber(location.coordinate.latitude),
+                                   HTTP_LONGITUDE_KEY: floatAsPBNumber(location.coordinate.longitude),
+                                   HTTP_ALTITUDE_KEY: floatAsPBNumber(location.altitude)
+                                   };
+        NSLog(@"Sending location dictionary.");
+        [ourWatch appMessagesPushUpdate:response onSent:nil];
+    }
+}
+
 #pragma mark PBPebbleCentral delegate
 
 - (void)pebbleCentral:(PBPebbleCentral *)central watchDidConnect:(PBWatch *)watch isNew:(BOOL)isNew {
@@ -165,6 +203,9 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
     if([message objectForKey:HTTP_TIME_KEY]) {
         return [self handleWatch:watch timeFromMessage:message];
     }
+    if([message objectForKey:HTTP_LOCATION_KEY]) {
+        return [self handleWatch:watch locationFromMessage:message];
+    }
     return NO;
 }
 
@@ -184,12 +225,11 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
     NSLog(@"Asked to request the contents of %@", url);
     NSMutableDictionary *request_dict = [[NSMutableDictionary alloc] initWithCapacity:[message count]];
     for (NSNumber* key in message) {
-        if([key isEqualToNumber:HTTP_URL_KEY] || [key isEqualToNumber:HTTP_COOKIE_KEY]) {
+        if([key isEqualToNumber:HTTP_URL_KEY] || [key isEqualToNumber:HTTP_COOKIE_KEY] || [key isEqualToNumber:HTTP_APP_ID_KEY]) {
             continue;
         }
         [request_dict setValue:[message objectForKey:key] forKey:[key stringValue]];
     }
-    [request_dict removeObjectsForKeys:@[HTTP_URL_KEY, HTTP_COOKIE_KEY]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
     [request setHTTPMethod:@"POST"];
     [request setValue:[watch serialNumber] forHTTPHeaderField:@"X-Pebble-ID"];
@@ -415,6 +455,11 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
     response[HTTP_TIME_KEY] = [NSNumber numberWithUint32:time(nil)];
     NSLog(@"Sending tz data: %@", response);
     [watch appMessagesPushUpdate:response onSent:nil];
+    return YES;
+}
+
+-(BOOL)handleWatch:(PBWatch *)watch locationFromMessage:(NSDictionary *)message {
+    [locationManager startUpdatingLocation];
     return YES;
 }
 
