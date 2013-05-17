@@ -212,6 +212,9 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
 - (void)handleHTTPResponse:(NSURLResponse*)response data:(NSData*)data error:(NSError*)error forWatch:(PBWatch*)watch message:(NSDictionary*)message sk:(NSNumber*)success_key {
     NSNumber* cookie = [message objectForKey:HTTP_COOKIE_KEY];
     NSNumber* app_id = [message objectForKey:HTTP_APP_ID_KEY];
+    if(!app_id) {
+        app_id = @(0);
+    }
     NSLog(@"Got HTTP response.");
     NSInteger status_code = [(NSHTTPURLResponse*)response statusCode];
     if(error) {
