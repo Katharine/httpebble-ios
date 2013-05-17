@@ -209,9 +209,78 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
     return NO;
 }
 
+- (void)handleHTTPResponse:(NSURLResponse*)response data:(NSData*)data error:(NSError*)error forWatch:(PBWatch*)watch message:(NSDictionary*)message sk:(NSNumber*)success_key {
+    NSNumber* cookie = [message objectForKey:HTTP_COOKIE_KEY];
+    NSNumber* app_id = [message objectForKey:HTTP_APP_ID_KEY];
+    NSLog(@"Got HTTP response.");
+    NSInteger status_code = [(NSHTTPURLResponse*)response statusCode];
+    if(error) {
+        NSLog(@"Something went wrong: %@", error);
+        httpErrorResponse(watch, success_key, status_code);
+        return;
+    }
+    NSError *json_error = nil;
+    NSDictionary *json_response = [NSJSONSerialization JSONObjectWithData:data options:0 error:&json_error];
+    if(error) {
+        NSLog(@"Invalid JSON: %@", json_error);
+        httpErrorResponse(watch, success_key, 500);
+        return;
+    }
+    NSMutableDictionary *response_dict = [[NSMutableDictionary alloc] initWithCapacity:[json_response count]];
+    NSLog(@"Parsing received dictionary: %@", json_response);
+    for(NSString* key in json_response) {
+        NSNumber *k = [NSNumber numberWithInteger:[key integerValue]];
+        id value = [json_response objectForKey:key];
+        if([value isKindOfClass:[NSArray class]]) {
+            NSArray* array_value = (NSArray*)value;
+            if([array_value count] != 2 ||
+               ![[array_value objectAtIndex:0] isKindOfClass:[NSString class]] ||
+               ![[array_value objectAtIndex:1] isKindOfClass:[NSNumber class]]) {
+                NSLog(@"Illegal size specification: %@", array_value);
+                httpErrorResponse(watch, success_key, 500);
+                return;
+            }
+            NSString *size_specification = [array_value objectAtIndex:0];
+            NSInteger number = [[array_value objectAtIndex:1] integerValue];
+            NSNumber *pebble_value;
+            if([size_specification isEqualToString:@"b"]) {
+                pebble_value = [NSNumber numberWithInt8:number];
+            } else if([size_specification isEqualToString:@"B"]) {
+                pebble_value = [NSNumber numberWithUint8:number];
+            } else if([size_specification isEqualToString:@"s"]) {
+                pebble_value = [NSNumber numberWithInt16:number];
+            } else if([size_specification isEqualToString:@"S"]) {
+                pebble_value = [NSNumber numberWithUint16:number];
+            } else if([size_specification isEqualToString:@"i"]) {
+                pebble_value = [NSNumber numberWithInt32:number];
+            } else if([size_specification isEqualToString:@"I"]) {
+                pebble_value = [NSNumber numberWithUint32:number];
+            } else {
+                NSLog(@"Illegal size string: %@", size_specification);
+                httpErrorResponse(watch, success_key, 500);
+                return;
+            }
+            [response_dict setObject:pebble_value forKey:k];
+        } else if([value isKindOfClass:[NSString class]]) {
+            [response_dict setObject:value forKey:k];
+        } else if([value isKindOfClass:[NSNumber class]]) {
+            [response_dict setObject:[NSNumber numberWithInt32:[value integerValue]] forKey:k];
+        }
+    }
+    [response_dict setObject:[NSNumber numberWithUint8:YES] forKey:success_key];
+    [response_dict setObject:[NSNumber numberWithUint16:status_code] forKey:HTTP_STATUS_KEY];
+    [response_dict setObject:app_id forKey:HTTP_APP_ID_KEY];
+    [response_dict setObject:cookie forKey:HTTP_COOKIE_KEY];
+    NSLog(@"Pushing dictionary to watch: %@", response_dict);
+    [watch appMessagesPushUpdate:response_dict onSent:^(PBWatch *watch, NSDictionary *update, NSError *error) {
+        if(error) {
+            NSLog(@"Response send failed: %@", error);
+        }
+    }];
+}
+
 - (BOOL)handleWatch:(PBWatch *)watch HTTPRequestFromMessage:(NSDictionary *)message {
     NSURL* url = [NSURL URLWithString:[message objectForKey:HTTP_URL_KEY]];
-    NSNumber* cookie = [message objectForKey:HTTP_COOKIE_KEY];
     // Now we have an app ID, too.
     NSNumber* app_id = [message objectForKey:HTTP_APP_ID_KEY];
     NSNumber* success_key = HTTP_URL_KEY;
@@ -225,87 +294,34 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
     NSLog(@"Asked to request the contents of %@", url);
     NSMutableDictionary *request_dict = [[NSMutableDictionary alloc] initWithCapacity:[message count]];
     for (NSNumber* key in message) {
-        if([key isEqualToNumber:HTTP_URL_KEY] || [key isEqualToNumber:HTTP_COOKIE_KEY] || [key isEqualToNumber:HTTP_APP_ID_KEY]) {
+        NSUInteger uint_key = [key unsignedIntegerValue];
+        if(uint_key >= 0xF000 && uint_key <= 0xFFFF) {
             continue;
         }
         [request_dict setValue:[message objectForKey:key] forKey:[key stringValue]];
     }
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:30.0];
+    NSData *json = [NSJSONSerialization dataWithJSONObject:request_dict options:0 error:nil];
     [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:json];
     [request setValue:[watch serialNumber] forHTTPHeaderField:@"X-Pebble-ID"];
-    NSLog(@"X-Pebble-ID: %@", [request valueForHTTPHeaderField:@"X-Pebble-ID"]);
-    [request setHTTPBody:[NSJSONSerialization dataWithJSONObject:request_dict options:0 error:nil]];
-    NSLog(@"Made request with data: %@", request_dict);
-    [NSURLConnection sendAsynchronousRequest:request
-                                       queue:[NSOperationQueue currentQueue]
-                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-                               NSLog(@"Got HTTP response.");
-                               NSInteger status_code = [(NSHTTPURLResponse*)response statusCode];
-                               if(error) {
-                                   NSLog(@"Something went wrong: %@", error);
-                                   httpErrorResponse(watch, success_key, status_code);
-                                   return;
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    NSCachedURLResponse *cached = [[NSURLCache sharedURLCache] cachedResponseForRequest:request];
+    if(cached) {
+        NSLog(@"Got cached response");
+        [self handleHTTPResponse:[cached response] data:[cached data] error:nil forWatch:watch message:message sk:success_key];
+    } else {
+        NSLog(@"Made request with data: %@", request_dict);
+        [NSURLConnection sendAsynchronousRequest:request
+                                           queue:[NSOperationQueue currentQueue]
+                               completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                                   [self handleHTTPResponse:response data:data error:error forWatch:watch message:message sk:success_key];
+                                   NSCachedURLResponse *new_cache = [[NSCachedURLResponse alloc] initWithResponse:response data:data];
+                                   [[NSURLCache sharedURLCache] storeCachedResponse:new_cache forRequest:request];
+                                   NSLog(@"Cached.");
                                }
-                               NSError *json_error = nil;
-                               NSDictionary *json_response = [NSJSONSerialization JSONObjectWithData:data options:0 error:&json_error];
-                               if(error) {
-                                   NSLog(@"Invalid JSON: %@", json_error);
-                                   httpErrorResponse(watch, success_key, 500);
-                                   return;
-                               }
-                               NSMutableDictionary *response_dict = [[NSMutableDictionary alloc] initWithCapacity:[json_response count]];
-                               NSLog(@"Parsing received dictionary: %@", json_response);
-                               for(NSString* key in json_response) {
-                                   NSNumber *k = [NSNumber numberWithInteger:[key integerValue]];
-                                   id value = [json_response objectForKey:key];
-                                   if([value isKindOfClass:[NSArray class]]) {
-                                       NSArray* array_value = (NSArray*)value;
-                                       if([array_value count] != 2 ||
-                                          ![[array_value objectAtIndex:0] isKindOfClass:[NSString class]] ||
-                                          ![[array_value objectAtIndex:1] isKindOfClass:[NSNumber class]]) {
-                                           NSLog(@"Illegal size specification: %@", array_value);
-                                           httpErrorResponse(watch, success_key, 500);
-                                           return;
-                                       }
-                                       NSString *size_specification = [array_value objectAtIndex:0];
-                                       NSInteger number = [[array_value objectAtIndex:1] integerValue];
-                                       NSNumber *pebble_value;
-                                       if([size_specification isEqualToString:@"b"]) {
-                                           pebble_value = [NSNumber numberWithInt8:number];
-                                       } else if([size_specification isEqualToString:@"B"]) {
-                                           pebble_value = [NSNumber numberWithUint8:number];
-                                       } else if([size_specification isEqualToString:@"s"]) {
-                                           pebble_value = [NSNumber numberWithInt16:number];
-                                       } else if([size_specification isEqualToString:@"S"]) {
-                                           pebble_value = [NSNumber numberWithUint16:number];
-                                       } else if([size_specification isEqualToString:@"i"]) {
-                                           pebble_value = [NSNumber numberWithInt32:number];
-                                       } else if([size_specification isEqualToString:@"I"]) {
-                                           pebble_value = [NSNumber numberWithUint32:number];
-                                       } else {
-                                           NSLog(@"Illegal size string: %@", size_specification);
-                                           httpErrorResponse(watch, success_key, 500);
-                                           return;
-                                       }
-                                       [response_dict setObject:pebble_value forKey:k];
-                                   } else if([value isKindOfClass:[NSString class]]) {
-                                       [response_dict setObject:value forKey:k];
-                                   } else if([value isKindOfClass:[NSNumber class]]) {
-                                       [response_dict setObject:[NSNumber numberWithInt32:[value integerValue]] forKey:k];
-                                   }
-                               }
-                               [response_dict setObject:[NSNumber numberWithUint8:YES] forKey:success_key];
-                               [response_dict setObject:[NSNumber numberWithUint16:status_code] forKey:HTTP_STATUS_KEY];
-                               [response_dict setObject:app_id forKey:HTTP_APP_ID_KEY];
-                               [response_dict setObject:cookie forKey:HTTP_COOKIE_KEY];
-                               NSLog(@"Pushing dictionary to watch: %@", response_dict);
-                               [watch appMessagesPushUpdate:response_dict onSent:^(PBWatch *watch, NSDictionary *update, NSError *error) {
-                                   if(error) {
-                                       NSLog(@"Response send failed: %@", error);
-                                   }
-                               }];
-                           }
-     ];
+         ];
+    }
     return YES;
 }
 
