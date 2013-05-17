@@ -309,19 +309,41 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
     NSCachedURLResponse *cached = [[NSURLCache sharedURLCache] cachedResponseForRequest:request];
     if(cached) {
         NSLog(@"Got cached response");
-        [self handleHTTPResponse:[cached response] data:[cached data] error:nil forWatch:watch message:message sk:success_key];
-    } else {
-        NSLog(@"Made request with data: %@", request_dict);
-        [NSURLConnection sendAsynchronousRequest:request
-                                           queue:[NSOperationQueue currentQueue]
-                               completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-                                   [self handleHTTPResponse:response data:data error:error forWatch:watch message:message sk:success_key];
-                                   NSCachedURLResponse *new_cache = [[NSCachedURLResponse alloc] initWithResponse:response data:data];
-                                   [[NSURLCache sharedURLCache] storeCachedResponse:new_cache forRequest:request];
+        if([[cached userInfo][@"expires"] timeIntervalSinceNow] < 0) {
+            NSLog(@"...but it's stale.");
+            [[NSURLCache sharedURLCache] removeCachedResponseForRequest:request];
+        } else {
+            NSLog(@"... and we can use it!");
+            [self handleHTTPResponse:[cached response] data:[cached data] error:nil forWatch:watch message:message sk:success_key];
+            return YES;
+        }
+    }
+    NSLog(@"Made request with data: %@", request_dict);
+    [NSURLConnection sendAsynchronousRequest:request
+                                       queue:[NSOperationQueue currentQueue]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                               [self handleHTTPResponse:response data:data error:error forWatch:watch message:message sk:success_key];
+                               NSDictionary *headers = [(NSHTTPURLResponse*)response allHeaderFields];
+                               NSString *cache_control = headers[@"Cache-Control"];
+                               if(cache_control) {
+                                   NSArray *parts = [cache_control componentsSeparatedByString:@";"];
+                                   for(NSString *part in parts) {
+                                       NSArray *kv = [cache_control componentsSeparatedByString:@"="];
+                                       if([[kv[0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] isEqualToString:@"max-age"]) {
+                                           NSInteger maxAge = [[kv[1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] integerValue];
+                                           if(maxAge > 0) {
+                                               NSDate* expires = [NSDate dateWithTimeIntervalSinceNow:maxAge];
+                                               NSCachedURLResponse *new_cache = [[NSCachedURLResponse alloc] initWithResponse:response data:data userInfo:@{@"expires": expires} storagePolicy:NSURLCacheStorageAllowed];
+                                               NSLog(@"Expires in %d at %@", maxAge, expires);
+                                               [[NSURLCache sharedURLCache] storeCachedResponse:new_cache forRequest:request];
+                                               return;
+                                           }
+                                       }
+                                   }
                                    NSLog(@"Cached.");
                                }
-         ];
-    }
+                           }
+     ];
     return YES;
 }
 
