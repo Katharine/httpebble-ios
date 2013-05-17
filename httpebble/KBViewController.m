@@ -24,9 +24,6 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-    NSUInteger capacity = [[NSURLCache sharedURLCache] memoryCapacity];
-    [[NSURLCache sharedURLCache] setMemoryCapacity:0];
-    [[NSURLCache sharedURLCache] setMemoryCapacity:capacity];
 }
 
 @end

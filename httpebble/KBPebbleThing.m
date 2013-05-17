@@ -38,6 +38,7 @@
 @interface KBPebbleThing () <PBPebbleCentralDelegate, CLLocationManagerDelegate> {
     PBWatch *ourWatch; // We actually never really use this.
     id updateHandler;
+    BOOL hasPendingLocationRequest;
     
     // Assorted managers
     NSManagedObjectContext *managedObjectContext; // Because Core Data.
@@ -74,6 +75,7 @@
         locationManager.delegate = self;
         locationManager.distanceFilter = kCLDistanceFilterNone;
         locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+        hasPendingLocationRequest = NO;
         
         // Set up the object model.
         NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"PebbleModel" withExtension:@"momd"];
@@ -137,8 +139,10 @@ NSNumber* floatAsPBNumber(float value) {
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
+    if(!hasPendingLocationRequest) return;
     CLLocation *location = [locations lastObject];
     if(abs([location.timestamp timeIntervalSinceNow]) < 60) {
+        hasPendingLocationRequest = NO;
         [locationManager stopUpdatingLocation];
         
         // Send a message back.
@@ -500,6 +504,7 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
 }
 
 -(BOOL)handleWatch:(PBWatch *)watch locationFromMessage:(NSDictionary *)message {
+    hasPendingLocationRequest = YES;
     [locationManager startUpdatingLocation];
     return YES;
 }
