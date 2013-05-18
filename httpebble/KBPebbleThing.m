@@ -129,6 +129,9 @@
                 NSLog(@"Error pushing post-reconnect update: %@", error);
             }
         }];
+        if(_delegate && [_delegate respondsToSelector:@selector(pebbleConnected:)]) {
+            [_delegate pebbleConnected:watch];
+        }
     }];
 }
 
@@ -173,6 +176,9 @@ NSNumber* floatAsPBNumber(float value) {
             updateHandler = nil;
         }
         [self setOurWatch:nil];
+        if(_delegate && [_delegate respondsToSelector:@selector(pebbleDisconnected)]) {
+            [_delegate pebbleDisconnected];
+        }
     }
 }
 

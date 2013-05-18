@@ -7,6 +7,7 @@
 //
 
 #import "KBViewController.h"
+#import <PebbleKit/PebbleKit.h>
 
 @interface KBViewController ()
 
@@ -18,6 +19,14 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+}
+
+- (void)pebbleConnected:(PBWatch *)watch {
+    [connectedLabel setText:[NSString stringWithFormat:@"Connected to %@", [watch name], nil]];
+}
+
+- (void)pebbleDisconnected {
+    [connectedLabel setText:@"Disconnected"];
 }
 
 - (void)didReceiveMemoryWarning

@@ -23,8 +23,8 @@
     [self.window makeKeyAndVisible];
     
     self.pebbleThing = [[KBPebbleThing alloc] init];
+    self.pebbleThing.delegate = self.viewController;
 
-    
     return YES;
 }
 

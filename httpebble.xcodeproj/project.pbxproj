@@ -11,6 +11,9 @@
 		89AC134717459B20006847A7 /* KBPebbleValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 89AC134617459B20006847A7 /* KBPebbleValue.m */; };
 		89AC13831745B12D006847A7 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89AC13821745B12D006847A7 /* CoreData.framework */; };
 		89AC1385174632E4006847A7 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89AC1384174632E4006847A7 /* CoreLocation.framework */; };
+		89AC13871746F465006847A7 /* cloudpebble.png in Resources */ = {isa = PBXBuildFile; fileRef = 89AC13861746F465006847A7 /* cloudpebble.png */; };
+		89BBD7151747081B00465DA9 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 89BBD7141747081B00465DA9 /* icon.png */; };
+		89BBD7171747082C00465DA9 /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 89BBD7161747082C00465DA9 /* icon@2x.png */; };
 		89E96D2A173DA96B00E2DE9D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89E96D29173DA96B00E2DE9D /* UIKit.framework */; };
 		89E96D2C173DA96B00E2DE9D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89E96D2B173DA96B00E2DE9D /* Foundation.framework */; };
 		89E96D2E173DA96B00E2DE9D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89E96D2D173DA96B00E2DE9D /* CoreGraphics.framework */; };
@@ -38,6 +41,9 @@
 		89AC134617459B20006847A7 /* KBPebbleValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KBPebbleValue.m; path = httpebble/KBPebbleValue.m; sourceTree = "<group>"; };
 		89AC13821745B12D006847A7 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		89AC1384174632E4006847A7 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		89AC13861746F465006847A7 /* cloudpebble.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cloudpebble.png; sourceTree = "<group>"; };
+		89BBD7141747081B00465DA9 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		89BBD7161747082C00465DA9 /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
 		89E96D26173DA96B00E2DE9D /* httpebble.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = httpebble.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		89E96D29173DA96B00E2DE9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		89E96D2B173DA96B00E2DE9D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -91,6 +97,8 @@
 		89E96D1D173DA96B00E2DE9D = {
 			isa = PBXGroup;
 			children = (
+				89BBD7161747082C00465DA9 /* icon@2x.png */,
+				89BBD7141747081B00465DA9 /* icon.png */,
 				89AC1384174632E4006847A7 /* CoreLocation.framework */,
 				89AC13821745B12D006847A7 /* CoreData.framework */,
 				89AC133F17458F0F006847A7 /* PebbleModel.xcdatamodeld */,
@@ -145,6 +153,7 @@
 		89E96D30173DA96B00E2DE9D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				89AC13861746F465006847A7 /* cloudpebble.png */,
 				89E96D31173DA96B00E2DE9D /* httpebble-Info.plist */,
 				89E96D32173DA96B00E2DE9D /* InfoPlist.strings */,
 				89E96D35173DA96B00E2DE9D /* main.m */,
@@ -213,6 +222,9 @@
 				89E96D3E173DA96B00E2DE9D /* Default@2x.png in Resources */,
 				89E96D40173DA96B00E2DE9D /* Default-568h@2x.png in Resources */,
 				89E96D46173DA96B00E2DE9D /* KBViewController.xib in Resources */,
+				89AC13871746F465006847A7 /* cloudpebble.png in Resources */,
+				89BBD7151747081B00465DA9 /* icon.png in Resources */,
+				89BBD7171747082C00465DA9 /* icon@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,7 +332,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "httpebble/httpebble-Prefix.pch";
 				INFOPLIST_FILE = "httpebble/httpebble-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -337,7 +349,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "httpebble/httpebble-Prefix.pch";
 				INFOPLIST_FILE = "httpebble/httpebble-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

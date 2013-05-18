@@ -7,7 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "KBPebbleThing.h"
 
-@interface KBViewController : UIViewController
+@interface KBViewController: UIViewController<KBPebbleThingDelegate>  {
+    IBOutlet UILabel* connectedLabel;
+}
+
+- (void)pebbleConnected:(PBWatch *)watch;
+- (void)pebbleDisconnected;
 
 @end

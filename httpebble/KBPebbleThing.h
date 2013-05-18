@@ -8,7 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
+@class PBWatch;
+
+@protocol KBPebbleThingDelegate <NSObject>
+
+- (void)pebbleConnected:(PBWatch*) watch;
+- (void)pebbleDisconnected;
+
+@end
+
 @interface KBPebbleThing : NSObject
+
+@property (nonatomic, assign) id<KBPebbleThingDelegate> delegate;
 
 - (void)saveKeyValueData;
 
