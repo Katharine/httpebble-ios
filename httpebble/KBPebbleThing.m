@@ -8,6 +8,7 @@
 
 #import "KBPebbleThing.h"
 #import "KBPebbleValue.h"
+#import "NSData+Base64.h"
 #import <PebbleKit/PebbleKit.h>
 #import <CoreData/CoreData.h>
 #import <CoreLocation/CoreLocation.h>
@@ -237,6 +238,7 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status, 
         return;
     }
     NSError *json_error = nil;
+    NSLog(@"Raw response: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     NSDictionary *json_response = [NSJSONSerialization JSONObjectWithData:data options:0 error:&json_error];
     if(error) {
         NSLog(@"Invalid JSON: %@", json_error);
@@ -251,33 +253,47 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status, 
         if([value isKindOfClass:[NSArray class]]) {
             NSArray* array_value = (NSArray*)value;
             if([array_value count] != 2 ||
-               ![[array_value objectAtIndex:0] isKindOfClass:[NSString class]] ||
-               ![[array_value objectAtIndex:1] isKindOfClass:[NSNumber class]]) {
+               ![[array_value objectAtIndex:0] isKindOfClass:[NSString class]]) {
                 NSLog(@"Illegal size specification: %@", array_value);
                 httpErrorResponse(watch, success_key, 500, app_id);
                 return;
             }
             NSString *size_specification = [array_value objectAtIndex:0];
-            NSInteger number = [[array_value objectAtIndex:1] integerValue];
-            NSNumber *pebble_value;
-            if([size_specification isEqualToString:@"b"]) {
-                pebble_value = [NSNumber numberWithInt8:number];
-            } else if([size_specification isEqualToString:@"B"]) {
-                pebble_value = [NSNumber numberWithUint8:number];
-            } else if([size_specification isEqualToString:@"s"]) {
-                pebble_value = [NSNumber numberWithInt16:number];
-            } else if([size_specification isEqualToString:@"S"]) {
-                pebble_value = [NSNumber numberWithUint16:number];
-            } else if([size_specification isEqualToString:@"i"]) {
-                pebble_value = [NSNumber numberWithInt32:number];
-            } else if([size_specification isEqualToString:@"I"]) {
-                pebble_value = [NSNumber numberWithUint32:number];
-            } else {
-                NSLog(@"Illegal size string: %@", size_specification);
-                httpErrorResponse(watch, success_key, 500, app_id);
-                return;
+            if([[array_value objectAtIndex:1] isKindOfClass:[NSNumber class]]) {
+                NSInteger number = [[array_value objectAtIndex:1] integerValue];
+                NSNumber *pebble_value;
+                if([size_specification isEqualToString:@"b"]) {
+                    pebble_value = [NSNumber numberWithInt8:number];
+                } else if([size_specification isEqualToString:@"B"]) {
+                    pebble_value = [NSNumber numberWithUint8:number];
+                } else if([size_specification isEqualToString:@"s"]) {
+                    pebble_value = [NSNumber numberWithInt16:number];
+                } else if([size_specification isEqualToString:@"S"]) {
+                    pebble_value = [NSNumber numberWithUint16:number];
+                } else if([size_specification isEqualToString:@"i"]) {
+                    pebble_value = [NSNumber numberWithInt32:number];
+                } else if([size_specification isEqualToString:@"I"]) {
+                    pebble_value = [NSNumber numberWithUint32:number];
+                } else {
+                    NSLog(@"Illegal numeric size string: %@", size_specification);
+                    httpErrorResponse(watch, success_key, 500, app_id);
+                    return;
+                }
+                [response_dict setObject:pebble_value forKey:k];
+            } else if([[array_value objectAtIndex:1] isKindOfClass:[NSString class]]) {
+                if([size_specification isEqualToString:@"d"]) {
+                    NSData* pebble_value = [NSData dataFromBase64String:[array_value objectAtIndex:1]];
+                    if(pebble_value != nil) {
+                        [response_dict setObject:pebble_value forKey:k];
+                    } else {
+                        NSLog(@"Failed to decode base64 string.");
+                        httpErrorResponse(watch, success_key, 500, app_id);
+                        return;
+                    }
+                } else {
+                    NSLog(@"Illegal string data type specification: %@", size_specification);
+                }
             }
-            [response_dict setObject:pebble_value forKey:k];
         } else if([value isKindOfClass:[NSString class]]) {
             [response_dict setObject:value forKey:k];
         } else if([value isKindOfClass:[NSNumber class]]) {

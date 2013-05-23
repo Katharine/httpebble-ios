@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		89A25B69174DB490008BED04 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 89A25B68174DB490008BED04 /* NSData+Base64.m */; };
 		89AC134117458F0F006847A7 /* PebbleModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 89AC133F17458F0F006847A7 /* PebbleModel.xcdatamodeld */; };
 		89AC134717459B20006847A7 /* KBPebbleValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 89AC134617459B20006847A7 /* KBPebbleValue.m */; };
 		89AC13831745B12D006847A7 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 89AC13821745B12D006847A7 /* CoreData.framework */; };
@@ -36,6 +37,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		89A25B67174DB490008BED04 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
+		89A25B68174DB490008BED04 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
 		89AC134017458F0F006847A7 /* PebbleModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PebbleModel.xcdatamodel; sourceTree = "<group>"; };
 		89AC134517459B20006847A7 /* KBPebbleValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KBPebbleValue.h; path = httpebble/KBPebbleValue.h; sourceTree = "<group>"; };
 		89AC134617459B20006847A7 /* KBPebbleValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KBPebbleValue.m; path = httpebble/KBPebbleValue.m; sourceTree = "<group>"; };
@@ -146,6 +149,8 @@
 				89E96D30173DA96B00E2DE9D /* Supporting Files */,
 				89E96D50173DB13700E2DE9D /* KBPebbleThing.h */,
 				89E96D51173DB13700E2DE9D /* KBPebbleThing.m */,
+				89A25B67174DB490008BED04 /* NSData+Base64.h */,
+				89A25B68174DB490008BED04 /* NSData+Base64.m */,
 			);
 			path = httpebble;
 			sourceTree = "<group>";
@@ -241,6 +246,7 @@
 				89E96D52173DB13700E2DE9D /* KBPebbleThing.m in Sources */,
 				89AC134117458F0F006847A7 /* PebbleModel.xcdatamodeld in Sources */,
 				89AC134717459B20006847A7 /* KBPebbleValue.m in Sources */,
+				89A25B69174DB490008BED04 /* NSData+Base64.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
