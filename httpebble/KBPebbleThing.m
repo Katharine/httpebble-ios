@@ -184,12 +184,16 @@ NSNumber* floatAsPBNumber(float value) {
 
 #pragma mark Other stuff
 
-void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) {
-    NSDictionary *error_response = [NSDictionary
-                                    dictionaryWithObjects:@[[NSNumber numberWithUint8:NO], [NSNumber numberWithUint16:status]]
-                                    forKeys:@[success_key, HTTP_STATUS_KEY]];
+void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status, NSNumber* app_id) {
+    NSDictionary *error_response = @{
+                                     success_key: [NSNumber numberWithUint8:NO],
+                                     HTTP_STATUS_KEY: [NSNumber numberWithUint16:status],
+                                     HTTP_APP_ID_KEY: app_id
+                                     };
+    NSLog(@"Sending error response: %@", error_response);
     [watch appMessagesPushUpdate:error_response onSent:^(PBWatch *watch, NSDictionary *update, NSError *error) {
-        NSLog(@"Error response failed: %@", error);
+        if(error)
+            NSLog(@"Error response failed: %@", error);
     }];
 }
 
@@ -229,14 +233,14 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
     NSInteger status_code = [(NSHTTPURLResponse*)response statusCode];
     if(error) {
         NSLog(@"Something went wrong: %@", error);
-        httpErrorResponse(watch, success_key, status_code);
+        httpErrorResponse(watch, success_key, 400, app_id);
         return;
     }
     NSError *json_error = nil;
     NSDictionary *json_response = [NSJSONSerialization JSONObjectWithData:data options:0 error:&json_error];
     if(error) {
         NSLog(@"Invalid JSON: %@", json_error);
-        httpErrorResponse(watch, success_key, 500);
+        httpErrorResponse(watch, success_key, 500, app_id);
         return;
     }
     NSMutableDictionary *response_dict = [[NSMutableDictionary alloc] initWithCapacity:[json_response count]];
@@ -250,7 +254,7 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
                ![[array_value objectAtIndex:0] isKindOfClass:[NSString class]] ||
                ![[array_value objectAtIndex:1] isKindOfClass:[NSNumber class]]) {
                 NSLog(@"Illegal size specification: %@", array_value);
-                httpErrorResponse(watch, success_key, 500);
+                httpErrorResponse(watch, success_key, 500, app_id);
                 return;
             }
             NSString *size_specification = [array_value objectAtIndex:0];
@@ -270,7 +274,7 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status) 
                 pebble_value = [NSNumber numberWithUint32:number];
             } else {
                 NSLog(@"Illegal size string: %@", size_specification);
-                httpErrorResponse(watch, success_key, 500);
+                httpErrorResponse(watch, success_key, 500, app_id);
                 return;
             }
             [response_dict setObject:pebble_value forKey:k];
