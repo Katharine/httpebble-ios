@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		336523A417548F1A003E3767 /* whiteButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 336523A017548F1A003E3767 /* whiteButton.png */; };
+		336523A517548F1A003E3767 /* whiteButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 336523A117548F1A003E3767 /* whiteButton@2x.png */; };
+		336523A617548F1A003E3767 /* whiteButtonHighlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 336523A217548F1A003E3767 /* whiteButtonHighlight.png */; };
+		336523A717548F1A003E3767 /* whiteButtonHighlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 336523A317548F1A003E3767 /* whiteButtonHighlight@2x.png */; };
 		89A25B69174DB490008BED04 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 89A25B68174DB490008BED04 /* NSData+Base64.m */; };
 		89AC134117458F0F006847A7 /* PebbleModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 89AC133F17458F0F006847A7 /* PebbleModel.xcdatamodeld */; };
 		89AC134717459B20006847A7 /* KBPebbleValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 89AC134617459B20006847A7 /* KBPebbleValue.m */; };
@@ -37,6 +41,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		336523A017548F1A003E3767 /* whiteButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteButton.png; sourceTree = "<group>"; };
+		336523A117548F1A003E3767 /* whiteButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "whiteButton@2x.png"; sourceTree = "<group>"; };
+		336523A217548F1A003E3767 /* whiteButtonHighlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = whiteButtonHighlight.png; sourceTree = "<group>"; };
+		336523A317548F1A003E3767 /* whiteButtonHighlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "whiteButtonHighlight@2x.png"; sourceTree = "<group>"; };
 		89A25B67174DB490008BED04 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
 		89A25B68174DB490008BED04 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
 		89AC134017458F0F006847A7 /* PebbleModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PebbleModel.xcdatamodel; sourceTree = "<group>"; };
@@ -45,8 +53,8 @@
 		89AC13821745B12D006847A7 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		89AC1384174632E4006847A7 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		89AC13861746F465006847A7 /* cloudpebble.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cloudpebble.png; sourceTree = "<group>"; };
-		89BBD7141747081B00465DA9 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
-		89BBD7161747082C00465DA9 /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon@2x.png"; sourceTree = "<group>"; };
+		89BBD7141747081B00465DA9 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = ../icon.png; sourceTree = "<group>"; };
+		89BBD7161747082C00465DA9 /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon@2x.png"; path = "../icon@2x.png"; sourceTree = "<group>"; };
 		89E96D26173DA96B00E2DE9D /* httpebble.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = httpebble.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		89E96D29173DA96B00E2DE9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		89E96D2B173DA96B00E2DE9D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -100,8 +108,6 @@
 		89E96D1D173DA96B00E2DE9D = {
 			isa = PBXGroup;
 			children = (
-				89BBD7161747082C00465DA9 /* icon@2x.png */,
-				89BBD7141747081B00465DA9 /* icon.png */,
 				89AC1384174632E4006847A7 /* CoreLocation.framework */,
 				89AC13821745B12D006847A7 /* CoreData.framework */,
 				89AC133F17458F0F006847A7 /* PebbleModel.xcdatamodeld */,
@@ -158,6 +164,12 @@
 		89E96D30173DA96B00E2DE9D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				336523A017548F1A003E3767 /* whiteButton.png */,
+				336523A117548F1A003E3767 /* whiteButton@2x.png */,
+				336523A217548F1A003E3767 /* whiteButtonHighlight.png */,
+				336523A317548F1A003E3767 /* whiteButtonHighlight@2x.png */,
+				89BBD7161747082C00465DA9 /* icon@2x.png */,
+				89BBD7141747081B00465DA9 /* icon.png */,
 				89AC13861746F465006847A7 /* cloudpebble.png */,
 				89E96D31173DA96B00E2DE9D /* httpebble-Info.plist */,
 				89E96D32173DA96B00E2DE9D /* InfoPlist.strings */,
@@ -230,6 +242,10 @@
 				89AC13871746F465006847A7 /* cloudpebble.png in Resources */,
 				89BBD7151747081B00465DA9 /* icon.png in Resources */,
 				89BBD7171747082C00465DA9 /* icon@2x.png in Resources */,
+				336523A417548F1A003E3767 /* whiteButton.png in Resources */,
+				336523A517548F1A003E3767 /* whiteButton@2x.png in Resources */,
+				336523A617548F1A003E3767 /* whiteButtonHighlight.png in Resources */,
+				336523A717548F1A003E3767 /* whiteButtonHighlight@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

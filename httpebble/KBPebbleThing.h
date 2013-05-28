@@ -10,10 +10,14 @@
 
 @class PBWatch;
 
+
+@class KBPebbleThing;
 @protocol KBPebbleThingDelegate <NSObject>
 
-- (void)pebbleConnected:(PBWatch*) watch;
-- (void)pebbleDisconnected;
+- (void)pebbleThing:(KBPebbleThing*)thing connected:(PBWatch *)watch;
+- (void)pebbleThing:(KBPebbleThing*)thing disconnected:(PBWatch *)watch;
+- (void)pebbleThing:(KBPebbleThing*)thing found:(PBWatch*)watch;
+- (void)pebbleThing:(KBPebbleThing*)thing lost:(PBWatch *)watch;
 
 @end
 
@@ -21,6 +25,9 @@
 
 @property (nonatomic, assign) id<KBPebbleThingDelegate> delegate;
 
+- (id)initWithDelegate:(id<KBPebbleThingDelegate>)delegate;
 - (void)saveKeyValueData;
+- (void)disconnect;
+- (void)connect;
 
 @end

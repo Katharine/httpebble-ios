@@ -13,6 +13,7 @@
 int main(int argc, char *argv[])
 {
     @autoreleasepool {
+        signal(SIGPIPE, SIG_IGN); // Some mysterious pipe somewhere breaks sometimes.
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([KBAppDelegate class]));
     }
 }

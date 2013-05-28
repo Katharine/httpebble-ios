@@ -16,14 +16,16 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // Set up our one default.
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"ShouldBeConnected": @(YES)}];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
     self.viewController = [[KBViewController alloc] initWithNibName:@"KBViewController" bundle:nil];
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
     
-    self.pebbleThing = [[KBPebbleThing alloc] init];
-    self.pebbleThing.delegate = self.viewController;
+    self.pebbleThing = [[KBPebbleThing alloc] initWithDelegate:self.viewController];
+    self.viewController.pebbleThing = self.pebbleThing;
 
     return YES;
 }

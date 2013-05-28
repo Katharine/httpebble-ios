@@ -11,9 +11,19 @@
 
 @interface KBViewController: UIViewController<KBPebbleThingDelegate>  {
     IBOutlet UILabel* connectedLabel;
+    IBOutlet UIButton* connectButton;
+    BOOL shouldBeConnected;
+    BOOL couldConnect;
+    BOOL isConnected;
 }
 
-- (void)pebbleConnected:(PBWatch *)watch;
-- (void)pebbleDisconnected;
+- (void)pebbleThing:(KBPebbleThing*)thing connected:(PBWatch *)watch;
+- (void)pebbleThing:(KBPebbleThing*)thing disconnected:(PBWatch *)watch;
+- (void)pebbleThing:(KBPebbleThing*)thing found:(PBWatch*)watch;
+- (void)pebbleThing:(KBPebbleThing*)thing lost:(PBWatch *)watch;
+
+- (IBAction)toggleConnected:(id)sender;
+
+@property (nonatomic, retain) KBPebbleThing *pebbleThing;
 
 @end

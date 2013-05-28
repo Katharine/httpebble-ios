@@ -40,6 +40,7 @@
     PBWatch *ourWatch; // We actually never really use this.
     id updateHandler;
     BOOL hasPendingLocationRequest;
+    BOOL isActive;
     
     // Assorted managers
     NSManagedObjectContext *managedObjectContext; // Because Core Data.
@@ -64,10 +65,11 @@
 
 @implementation KBPebbleThing
 
-- (id)init
+- (id)initWithDelegate:(id<KBPebbleThingDelegate>)delegate
 {
     self = [super init];
     if (self) {
+        self.delegate = delegate;
         [[PBPebbleCentral defaultCentral] setDelegate:self];
         [self setOurWatch:[[PBPebbleCentral defaultCentral] lastConnectedWatch]];
         
@@ -110,8 +112,18 @@
 }
 
 - (void)setOurWatch:(PBWatch*)watch {
-    if(watch == nil) return;
-    [watch appMessagesGetIsSupported:^(PBWatch *watch, BOOL isAppMessagesSupported) {
+    if(watch == nil) {
+        return;
+    }
+    if(![watch isConnected]) return;
+    ourWatch = watch;
+    if([_delegate respondsToSelector:@selector(pebbleThing:found:)]) {
+        [_delegate pebbleThing:self found:watch];
+    }
+}
+
+- (void)connect {
+    [ourWatch appMessagesGetIsSupported:^(PBWatch *watch, BOOL isAppMessagesSupported) {
         if(!isAppMessagesSupported) return;
         uint8_t uuid[] = HTTP_UUID;
         [watch appMessagesSetUUID:[NSData dataWithBytes:uuid length:sizeof(uuid)]];
@@ -130,10 +142,23 @@
                 NSLog(@"Error pushing post-reconnect update: %@", error);
             }
         }];
-        if(_delegate && [_delegate respondsToSelector:@selector(pebbleConnected:)]) {
-            [_delegate pebbleConnected:watch];
+        if(_delegate && [_delegate respondsToSelector:@selector(pebbleThing:connected:)]) {
+            [_delegate pebbleThing:self connected:watch];
         }
     }];
+}
+
+- (void)disconnect {
+    if(!ourWatch) return;
+    [ourWatch closeSession:nil];
+    if(updateHandler) {
+        [ourWatch appMessagesRemoveUpdateHandler:updateHandler];
+        updateHandler = nil;
+    }
+    if(_delegate && [_delegate respondsToSelector:@selector(pebbleThing:disconnected:)]) {
+        [_delegate pebbleThing:self disconnected:ourWatch];
+    }
+    [self setOurWatch:nil];
 }
 
 #pragma mark CLLocationManager delegate
@@ -171,14 +196,9 @@ NSNumber* floatAsPBNumber(float value) {
     NSLog(@"A watch disconnected.");
     if(watch == ourWatch) {
         NSLog(@"It was ours!");
-        [watch closeSession:nil];
-        if(updateHandler) {
-            [watch appMessagesRemoveUpdateHandler:updateHandler];
-            updateHandler = nil;
-        }
-        [self setOurWatch:nil];
-        if(_delegate && [_delegate respondsToSelector:@selector(pebbleDisconnected)]) {
-            [_delegate pebbleDisconnected];
+        [self disconnect];
+        if([_delegate respondsToSelector:@selector(pebbleThing:lost:)]) {
+            [_delegate pebbleThing:self lost:watch];
         }
     }
 }
