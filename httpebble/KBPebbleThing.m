@@ -257,6 +257,11 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status, 
         httpErrorResponse(watch, success_key, 400, app_id);
         return;
     }
+    if(status_code < 200 || status_code >= 300) {
+        NSLog(@"HTTP error %d", status_code);
+        httpErrorResponse(watch, success_key, status_code, app_id);
+        return;
+    }
     NSError *json_error = nil;
     NSLog(@"Raw response: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     NSDictionary *json_response = [NSJSONSerialization JSONObjectWithData:data options:0 error:&json_error];
