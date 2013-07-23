@@ -9,21 +9,19 @@
 #import <UIKit/UIKit.h>
 #import "KBPebbleThing.h"
 
-@interface KBViewController: UIViewController<KBPebbleThingDelegate>  {
+@interface KBViewController: UIViewController<KBPebbleThingDelegate, UIAlertViewDelegate>  {
     IBOutlet UILabel* connectedLabel;
     IBOutlet UIButton* connectButton;
     BOOL shouldBeConnected;
     BOOL couldConnect;
     BOOL isConnected;
+    IBOutlet UIImageView* screenImageView;
+    unsigned char frameBuffer[144*168*4];
 }
 
-- (void)pebbleThing:(KBPebbleThing*)thing connected:(PBWatch *)watch;
-- (void)pebbleThing:(KBPebbleThing*)thing disconnected:(PBWatch *)watch;
-- (void)pebbleThing:(KBPebbleThing*)thing found:(PBWatch*)watch;
-- (void)pebbleThing:(KBPebbleThing*)thing lost:(PBWatch *)watch;
+@property (nonatomic, retain) KBPebbleThing *pebbleThing;
 
 - (IBAction)toggleConnected:(id)sender;
-
-@property (nonatomic, retain) KBPebbleThing *pebbleThing;
+- (IBAction)saveScreenshot:(id)sender;
 
 @end

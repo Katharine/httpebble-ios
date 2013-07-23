@@ -48,8 +48,8 @@
 		89A25B67174DB490008BED04 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
 		89A25B68174DB490008BED04 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
 		89AC134017458F0F006847A7 /* PebbleModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PebbleModel.xcdatamodel; sourceTree = "<group>"; };
-		89AC134517459B20006847A7 /* KBPebbleValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KBPebbleValue.h; path = httpebble/KBPebbleValue.h; sourceTree = "<group>"; };
-		89AC134617459B20006847A7 /* KBPebbleValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KBPebbleValue.m; path = httpebble/KBPebbleValue.m; sourceTree = "<group>"; };
+		89AC134517459B20006847A7 /* KBPebbleValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KBPebbleValue.h; sourceTree = "<group>"; };
+		89AC134617459B20006847A7 /* KBPebbleValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KBPebbleValue.m; sourceTree = "<group>"; };
 		89AC13821745B12D006847A7 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		89AC1384174632E4006847A7 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		89AC13861746F465006847A7 /* cloudpebble.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cloudpebble.png; sourceTree = "<group>"; };
@@ -108,16 +108,6 @@
 		89E96D1D173DA96B00E2DE9D = {
 			isa = PBXGroup;
 			children = (
-				89AC1384174632E4006847A7 /* CoreLocation.framework */,
-				89AC13821745B12D006847A7 /* CoreData.framework */,
-				89AC133F17458F0F006847A7 /* PebbleModel.xcdatamodeld */,
-				89AC134517459B20006847A7 /* KBPebbleValue.h */,
-				89AC134617459B20006847A7 /* KBPebbleValue.m */,
-				89E96D5B173DB49500E2DE9D /* MessageUI.framework */,
-				89E96D59173DB47D00E2DE9D /* CoreMotion.framework */,
-				89E96D57173DB47600E2DE9D /* ExternalAccessory.framework */,
-				89E96D55173DB46D00E2DE9D /* CoreBluetooth.framework */,
-				89E96D53173DB46600E2DE9D /* libz.dylib */,
 				89E96D2F173DA96B00E2DE9D /* httpebble */,
 				89E96D28173DA96B00E2DE9D /* Frameworks */,
 				89E96D27173DA96B00E2DE9D /* Products */,
@@ -135,6 +125,13 @@
 		89E96D28173DA96B00E2DE9D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				89E96D5B173DB49500E2DE9D /* MessageUI.framework */,
+				89E96D59173DB47D00E2DE9D /* CoreMotion.framework */,
+				89E96D57173DB47600E2DE9D /* ExternalAccessory.framework */,
+				89E96D55173DB46D00E2DE9D /* CoreBluetooth.framework */,
+				89E96D53173DB46600E2DE9D /* libz.dylib */,
+				89AC1384174632E4006847A7 /* CoreLocation.framework */,
+				89AC13821745B12D006847A7 /* CoreData.framework */,
 				89E96D4E173DAAA200E2DE9D /* PebbleVendor.framework */,
 				89E96D4C173DAA9800E2DE9D /* PebbleKit.framework */,
 				89E96D29173DA96B00E2DE9D /* UIKit.framework */,
@@ -147,6 +144,9 @@
 		89E96D2F173DA96B00E2DE9D /* httpebble */ = {
 			isa = PBXGroup;
 			children = (
+				89AC133F17458F0F006847A7 /* PebbleModel.xcdatamodeld */,
+				89AC134517459B20006847A7 /* KBPebbleValue.h */,
+				89AC134617459B20006847A7 /* KBPebbleValue.m */,
 				89E96D38173DA96B00E2DE9D /* KBAppDelegate.h */,
 				89E96D39173DA96B00E2DE9D /* KBAppDelegate.m */,
 				89E96D41173DA96B00E2DE9D /* KBViewController.h */,
@@ -408,7 +408,8 @@
 				89AC134017458F0F006847A7 /* PebbleModel.xcdatamodel */,
 			);
 			currentVersion = 89AC134017458F0F006847A7 /* PebbleModel.xcdatamodel */;
-			path = PebbleModel.xcdatamodeld;
+			name = PebbleModel.xcdatamodeld;
+			path = ../PebbleModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

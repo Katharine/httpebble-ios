@@ -12,6 +12,7 @@
 #import <PebbleKit/PebbleKit.h>
 #import <CoreData/CoreData.h>
 #import <CoreLocation/CoreLocation.h>
+
 #define HTTP_UUID { 0x91, 0x41, 0xB6, 0x28, 0xBC, 0x89, 0x49, 0x8E, 0xB1, 0x47, 0x04, 0x9F, 0x49, 0xC0, 0x99, 0xAD }
 
 #define HTTP_URL_KEY @(0xFFFF)
@@ -19,6 +20,8 @@
 #define HTTP_SUCCESS_KEY_DEPRECATED @(0xFFFD)
 #define HTTP_COOKIE_KEY @(0xFFFC)
 #define HTTP_CONNECT_KEY @(0xFFFB)
+#define HTTP_USE_GET_KEY @(0xFFFA)
+#define HTTP_FRAMEBUFFER_SLICE @(0xFFF9)
 
 #define HTTP_APP_ID_KEY @(0xFFF2)
 #define HTTP_COOKIE_STORE_KEY @(0xFFF0)
@@ -54,9 +57,9 @@
 - (BOOL)handleWatch:(PBWatch*)watch storeKeyFromMessage:(NSDictionary*)message;
 - (BOOL)handleWatch:(PBWatch*)watch getKeyFromMessage:(NSDictionary*)message;
 - (BOOL)handleWatch:(PBWatch*)watch saveFromMessage:(NSDictionary*)message;
-- (BOOL)handleWatch:(PBWatch *)watch deleteFromMessage:(NSDictionary *)message;
-- (BOOL)handleWatch:(PBWatch *)watch timeFromMessage:(NSDictionary *)message;
-- (BOOL)handleWatch:(PBWatch *)watch locationFromMessage:(NSDictionary *)message;
+- (BOOL)handleWatch:(PBWatch*)watch deleteFromMessage:(NSDictionary*)message;
+- (BOOL)handleWatch:(PBWatch*)watch timeFromMessage:(NSDictionary*)message;
+- (BOOL)handleWatch:(PBWatch*)watch locationFromMessage:(NSDictionary*)message;
 - (KBPebbleValue*)getStoredValueForApp:(NSNumber*)appID withKey:(NSNumber*)key;
 - (void)storeId:(id)value InPebbleValue:(KBPebbleValue*)pv;
 - (id)getIdFromPebbleValue:(KBPebbleValue*)pv;
@@ -87,12 +90,14 @@
         NSURL *storeURL = [[[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject] URLByAppendingPathComponent:@"pebble-kv.sqlite"];
         persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
         NSError *error;
+        // TODO: Add migration option
         [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error];
         if(error) {
             NSLog(@"Something went very wrong. Deleting key-value store.");
             NSLog(@"%@", error);
             [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil];
             error = nil;
+            // TODO: Add migration option
             [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error];
             if(error) {
                 NSLog(@"%@", error);
@@ -240,6 +245,9 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status, 
     }
     if([message objectForKey:HTTP_LOCATION_KEY]) {
         return [self handleWatch:watch locationFromMessage:message];
+    }
+    if([message objectForKey:HTTP_FRAMEBUFFER_SLICE]) {
+        return [self handleWatch:watch frameBufferSliceFromMessage:message];
     }
     return NO;
 }
@@ -557,6 +565,15 @@ void httpErrorResponse(PBWatch* watch, NSNumber* success_key, NSInteger status, 
 -(BOOL)handleWatch:(PBWatch *)watch locationFromMessage:(NSDictionary *)message {
     hasPendingLocationRequest = YES;
     [locationManager startUpdatingLocation];
+    return YES;
+}
+
+-(BOOL)handleWatch:(PBWatch *)watch frameBufferSliceFromMessage:(NSDictionary *)message {
+    if([_delegate respondsToSelector:@selector(pebbleThing:frameBuffer:fromIndex:)]) {
+        NSData* buffer = message[@(1000)];
+        NSNumber* index = message[HTTP_FRAMEBUFFER_SLICE];
+        [_delegate pebbleThing:self frameBuffer:buffer fromIndex:index.integerValue];
+    }
     return YES;
 }
 
