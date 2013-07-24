@@ -150,8 +150,11 @@ didFinishSavingWithError:(NSError*)error
 }
 
 - (IBAction)saveScreenshot:(id)sender {
-    if (screenImageView.image)
+    if (screenImageView.image) {
         [[[UIAlertView alloc] initWithTitle:@"Save" message:@"Save screenshot to camera roll?" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil] show];
+    } else {
+        [self.pebbleThing requestScreenshot];
+    }
 }
 
 - (void)handleConnection:(KBPebbleThing*)thing {

@@ -29,5 +29,6 @@
 - (void)saveKeyValueData;
 - (void)disconnect;
 - (void)connect;
+- (void)requestScreenshot;
 
 @end

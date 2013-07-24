@@ -166,6 +166,10 @@
     [self setOurWatch:nil];
 }
 
+- (void)requestScreenshot {
+    [ourWatch appMessagesPushUpdate:@{HTTP_FRAMEBUFFER_SLICE: @(0)} onSent:nil];
+}
+
 #pragma mark CLLocationManager delegate
 
 NSNumber* floatAsPBNumber(float value) {
