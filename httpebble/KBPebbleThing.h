@@ -9,15 +9,15 @@
 #import <Foundation/Foundation.h>
 
 @class PBWatch;
-
-
 @class KBPebbleThing;
+
 @protocol KBPebbleThingDelegate <NSObject>
 
 - (void)pebbleThing:(KBPebbleThing*)thing connected:(PBWatch *)watch;
 - (void)pebbleThing:(KBPebbleThing*)thing disconnected:(PBWatch *)watch;
 - (void)pebbleThing:(KBPebbleThing*)thing found:(PBWatch*)watch;
 - (void)pebbleThing:(KBPebbleThing*)thing lost:(PBWatch *)watch;
+- (void)pebbleThing:(KBPebbleThing*)thing frameBuffer:(NSData *)buffer fromIndex:(NSInteger)index;
 
 @end
 
@@ -29,5 +29,6 @@
 - (void)saveKeyValueData;
 - (void)disconnect;
 - (void)connect;
+- (void)requestScreenshot;
 
 @end
